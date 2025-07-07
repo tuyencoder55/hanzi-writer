@@ -8,16 +8,21 @@
       body {
         font-family: Arial, sans-serif;
         text-align: center;
-        padding: 30px;
+        padding: 40px;
+      }
+      #hanzi {
+        font-size: 64px;
+        margin-bottom: 10px;
       }
       #writer {
         width: 300px;
         height: 300px;
-        margin: 20px auto;
+        margin: 0 auto 20px;
       }
       #pinyin {
         font-size: 24px;
         font-weight: bold;
+        margin-bottom: 10px;
       }
       #meaning {
         font-size: 20px;
@@ -26,13 +31,13 @@
     </style>
   </head>
   <body>
-    <h1 id="hanzi" style="font-size: 48px"></h1>
+    <div id="hanzi"></div>
     <div id="writer"></div>
     <div id="pinyin"></div>
     <div id="meaning"></div>
 
     <script>
-      // Dán object dict vào đây (copy toàn bộ bạn đã có ở file canvas Hsk1 Dict Full)
+      // === DỮ LIỆU 150 TỪ HSK1 ===
       const dict = {
         爱: { pinyin: "ài", meaning: "yêu" },
         八: { pinyin: "bā", meaning: "số 8" },
@@ -187,8 +192,8 @@
       };
 
       function getCharacterFromURL() {
-        const path = window.location.pathname;
-        return decodeURIComponent(path.slice(1));
+        const path = decodeURIComponent(window.location.pathname.slice(1));
+        return path;
       }
 
       const char = getCharacterFromURL();
@@ -207,7 +212,7 @@
           showCharacter: false,
         }).loopCharacterAnimation();
       } else {
-        document.body.innerHTML = `<h2>❌ Không tìm thấy từ "${char}" trong HSK1!</h2>`;
+        document.body.innerHTML = `<h2>❌ Không tìm thấy từ "${char}" trong danh sách.</h2>`;
       }
     </script>
   </body>
