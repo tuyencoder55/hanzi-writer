@@ -1,66 +1,224 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
   <head>
     <meta charset="UTF-8" />
-    <title>Hanzi Writer Viewer</title>
-    <script src="https://unpkg.com/hanzi-writer@2.0.2/dist/hanzi-writer.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hanzi HSK1 Viewer</title>
+    <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@2.1.2/dist/hanzi-writer.min.js"></script>
     <style>
       body {
+        font-family: Arial, sans-serif;
         text-align: center;
-        font-family: sans-serif;
-        padding: 40px;
+        margin-top: 40px;
       }
-      #target {
-        width: 450px;
-        height: 450px;
+      #writer {
         margin: 20px auto;
+        width: 300px;
+        height: 300px;
       }
-      .pinyin {
-        font-size: 22px;
-        margin-top: 10px;
-        color: #333;
+      #pinyin {
+        font-size: 24px;
+        font-weight: bold;
+      }
+      #meaning {
+        font-size: 20px;
+        color: #555;
+      }
+      input {
+        font-size: 18px;
+        padding: 6px;
+        width: 200px;
+      }
+      button {
+        font-size: 16px;
+        padding: 6px 10px;
+        margin-left: 10px;
       }
     </style>
   </head>
   <body>
-    <h1>Hán tự: <span id="character"></span></h1>
-    <div id="target"></div>
-    <div id="info"></div>
+    <h1>🧠 Học Hán Tự - HSK1</h1>
+    <input id="inputChar" placeholder="Nhập chữ Hán (VD: 我)" />
+    <button onclick="renderChar()">Hiển thị</button>
+
+    <div id="writer"></div>
+    <div id="pinyin"></div>
+    <div id="meaning"></div>
 
     <script>
-      const char = decodeURIComponent(
-        window.location.pathname.slice(1) || "你"
-      );
-      document.getElementById("character").textContent = char;
-
-      const writer = HanziWriter.create("target", char, {
-        width: 450,
-        height: 450,
-        showOutline: true,
-        showCharacter: false,
-        strokeAnimationSpeed: 1.2,
-        delayBetweenStrokes: 150,
-      });
-      writer.animateCharacter();
-
-      // ✅ Sử dụng API khác từ HanziGyan (tin cậy, JSONP)
-      const script = document.createElement("script");
-      script.src = `https://cdn.jsdelivr.net/gh/pepebecker/hanzi-lookup@master/dict/pinyin-lookup.js`;
-      script.onload = () => {
-        const pinyin = window.pinyinDict[char];
-        if (pinyin) {
-          const pEl = document.createElement("p");
-          pEl.className = "pinyin";
-          pEl.innerText = "Pinyin: " + pinyin;
-          document.getElementById("info").appendChild(pEl);
-        } else {
-          const pEl = document.createElement("p");
-          pEl.className = "pinyin";
-          pEl.innerText = "Pinyin: không tìm thấy 😥";
-          document.getElementById("info").appendChild(pEl);
-        }
+      const dict = {
+        爱: { pinyin: "ài", meaning: "yêu" },
+        八: { pinyin: "bā", meaning: "số 8" },
+        爸爸: { pinyin: "bàba", meaning: "bố" },
+        杯子: { pinyin: "bēizi", meaning: "cái cốc" },
+        北京: { pinyin: "Běijīng", meaning: "Bắc Kinh" },
+        本: { pinyin: "běn", meaning: "lượng từ (quyển)" },
+        不: { pinyin: "bù", meaning: "không" },
+        菜: { pinyin: "cài", meaning: "món ăn" },
+        茶: { pinyin: "chá", meaning: "trà" },
+        吃: { pinyin: "chī", meaning: "ăn" },
+        出: { pinyin: "chū", meaning: "ra ngoài" },
+        穿: { pinyin: "chuān", meaning: "mặc" },
+        出租车: { pinyin: "chūzūchē", meaning: "xe taxi" },
+        打电话: { pinyin: "dǎ diànhuà", meaning: "gọi điện thoại" },
+        大: { pinyin: "dà", meaning: "to, lớn" },
+        的: { pinyin: "de", meaning: "trợ từ sở hữu" },
+        点: { pinyin: "diǎn", meaning: "giờ" },
+        电脑: { pinyin: "diànnǎo", meaning: "máy tính" },
+        电视: { pinyin: "diànshì", meaning: "tivi" },
+        电影: { pinyin: "diànyǐng", meaning: "phim" },
+        东西: { pinyin: "dōngxi", meaning: "đồ vật" },
+        读: { pinyin: "dú", meaning: "đọc" },
+        对不起: { pinyin: "duìbuqǐ", meaning: "xin lỗi" },
+        多: { pinyin: "duō", meaning: "nhiều" },
+        多少: { pinyin: "duōshǎo", meaning: "bao nhiêu" },
+        儿子: { pinyin: "érzi", meaning: "con trai" },
+        二: { pinyin: "èr", meaning: "số 2" },
+        饭店: { pinyin: "fàndiàn", meaning: "nhà hàng" },
+        飞机: { pinyin: "fēijī", meaning: "máy bay" },
+        分钟: { pinyin: "fēnzhōng", meaning: "phút" },
+        高兴: { pinyin: "gāoxìng", meaning: "vui vẻ" },
+        个: { pinyin: "gè", meaning: "cái (lượng từ)" },
+        工作: { pinyin: "gōngzuò", meaning: "công việc" },
+        狗: { pinyin: "gǒu", meaning: "con chó" },
+        汉语: { pinyin: "Hànyǔ", meaning: "tiếng Hán" },
+        好: { pinyin: "hǎo", meaning: "tốt" },
+        号: { pinyin: "hào", meaning: "ngày, số" },
+        喝: { pinyin: "hē", meaning: "uống" },
+        和: { pinyin: "hé", meaning: "và" },
+        很: { pinyin: "hěn", meaning: "rất" },
+        后面: { pinyin: "hòumiàn", meaning: "phía sau" },
+        回: { pinyin: "huí", meaning: "về" },
+        会: { pinyin: "huì", meaning: "biết (kỹ năng)" },
+        几: { pinyin: "jǐ", meaning: "mấy" },
+        家: { pinyin: "jiā", meaning: "nhà" },
+        叫: { pinyin: "jiào", meaning: "gọi, tên là" },
+        今天: { pinyin: "jīntiān", meaning: "hôm nay" },
+        九: { pinyin: "jiǔ", meaning: "số 9" },
+        开: { pinyin: "kāi", meaning: "mở, lái xe" },
+        看: { pinyin: "kàn", meaning: "xem, nhìn" },
+        看见: { pinyin: "kànjiàn", meaning: "nhìn thấy" },
+        块: { pinyin: "kuài", meaning: "đồng (tiền), miếng" },
+        来: { pinyin: "lái", meaning: "đến" },
+        老师: { pinyin: "lǎoshī", meaning: "giáo viên" },
+        了: { pinyin: "le", meaning: "rồi (trợ từ)" },
+        冷: { pinyin: "lěng", meaning: "lạnh" },
+        里: { pinyin: "lǐ", meaning: "bên trong" },
+        六: { pinyin: "liù", meaning: "số 6" },
+        妈妈: { pinyin: "māma", meaning: "mẹ" },
+        吗: { pinyin: "ma", meaning: "...không? (trợ từ)" },
+        买: { pinyin: "mǎi", meaning: "mua" },
+        猫: { pinyin: "māo", meaning: "mèo" },
+        没关系: { pinyin: "méi guānxi", meaning: "không sao" },
+        没有: { pinyin: "méiyǒu", meaning: "không có" },
+        米饭: { pinyin: "mǐfàn", meaning: "cơm" },
+        明天: { pinyin: "míngtiān", meaning: "ngày mai" },
+        名字: { pinyin: "míngzi", meaning: "tên" },
+        哪: { pinyin: "nǎ", meaning: "nào" },
+        哪儿: { pinyin: "nǎr", meaning: "ở đâu" },
+        那: { pinyin: "nà", meaning: "kia, đó" },
+        呢: { pinyin: "ne", meaning: "còn...thì sao? (trợ từ)" },
+        能: { pinyin: "néng", meaning: "có thể" },
+        你: { pinyin: "nǐ", meaning: "bạn" },
+        年: { pinyin: "nián", meaning: "năm" },
+        女儿: { pinyin: "nǚ'ér", meaning: "con gái" },
+        朋友: { pinyin: "péngyou", meaning: "bạn bè" },
+        漂亮: { pinyin: "piàoliang", meaning: "xinh đẹp" },
+        苹果: { pinyin: "píngguǒ", meaning: "quả táo" },
+        七: { pinyin: "qī", meaning: "số 7" },
+        钱: { pinyin: "qián", meaning: "tiền" },
+        前面: { pinyin: "qiánmiàn", meaning: "phía trước" },
+        请: { pinyin: "qǐng", meaning: "mời, xin vui lòng" },
+        去: { pinyin: "qù", meaning: "đi" },
+        热: { pinyin: "rè", meaning: "nóng" },
+        人: { pinyin: "rén", meaning: "người" },
+        认识: { pinyin: "rènshi", meaning: "quen biết" },
+        三: { pinyin: "sān", meaning: "số 3" },
+        商店: { pinyin: "shāngdiàn", meaning: "cửa hàng" },
+        上: { pinyin: "shàng", meaning: "trên, lên" },
+        上午: { pinyin: "shàngwǔ", meaning: "buổi sáng" },
+        少: { pinyin: "shǎo", meaning: "ít" },
+        谁: { pinyin: "shéi", meaning: "ai" },
+        什么: { pinyin: "shénme", meaning: "cái gì" },
+        十: { pinyin: "shí", meaning: "số 10" },
+        时候: { pinyin: "shíhou", meaning: "lúc, khi" },
+        是: { pinyin: "shì", meaning: "là" },
+        书: { pinyin: "shū", meaning: "sách" },
+        水: { pinyin: "shuǐ", meaning: "nước" },
+        水果: { pinyin: "shuǐguǒ", meaning: "trái cây" },
+        睡觉: { pinyin: "shuìjiào", meaning: "ngủ" },
+        说: { pinyin: "shuō", meaning: "nói" },
+        四: { pinyin: "sì", meaning: "số 4" },
+        岁: { pinyin: "suì", meaning: "tuổi" },
+        他: { pinyin: "tā", meaning: "anh ấy" },
+        她: { pinyin: "tā", meaning: "cô ấy" },
+        太: { pinyin: "tài", meaning: "quá, lắm" },
+        天气: { pinyin: "tiānqì", meaning: "thời tiết" },
+        听: { pinyin: "tīng", meaning: "nghe" },
+        同学: { pinyin: "tóngxué", meaning: "bạn cùng lớp" },
+        喂: { pinyin: "wèi", meaning: "alo" },
+        我: { pinyin: "wǒ", meaning: "tôi" },
+        我们: { pinyin: "wǒmen", meaning: "chúng tôi" },
+        五: { pinyin: "wǔ", meaning: "số 5" },
+        喜欢: { pinyin: "xǐhuan", meaning: "thích" },
+        下: { pinyin: "xià", meaning: "dưới, xuống" },
+        下午: { pinyin: "xiàwǔ", meaning: "buổi chiều" },
+        下雨: { pinyin: "xiàyǔ", meaning: "mưa" },
+        先生: { pinyin: "xiānsheng", meaning: "ông, tiên sinh" },
+        现在: { pinyin: "xiànzài", meaning: "bây giờ" },
+        想: { pinyin: "xiǎng", meaning: "muốn, nhớ" },
+        小: { pinyin: "xiǎo", meaning: "nhỏ" },
+        小姐: { pinyin: "xiǎojiě", meaning: "tiểu thư" },
+        些: { pinyin: "xiē", meaning: "một vài" },
+        写: { pinyin: "xiě", meaning: "viết" },
+        谢谢: { pinyin: "xièxie", meaning: "cảm ơn" },
+        星期: { pinyin: "xīngqī", meaning: "tuần, thứ" },
+        学生: { pinyin: "xuésheng", meaning: "học sinh" },
+        学习: { pinyin: "xuéxí", meaning: "học tập" },
+        学校: { pinyin: "xuéxiào", meaning: "trường học" },
+        一: { pinyin: "yī", meaning: "số 1" },
+        一点儿: { pinyin: "yìdiǎnr", meaning: "một chút" },
+        衣服: { pinyin: "yīfu", meaning: "quần áo" },
+        医生: { pinyin: "yīshēng", meaning: "bác sĩ" },
+        医院: { pinyin: "yīyuàn", meaning: "bệnh viện" },
+        椅子: { pinyin: "yǐzi", meaning: "cái ghế" },
+        有: { pinyin: "yǒu", meaning: "có" },
+        月: { pinyin: "yuè", meaning: "tháng" },
+        在: { pinyin: "zài", meaning: "ở, đang" },
+        再见: { pinyin: "zàijiàn", meaning: "tạm biệt" },
+        怎么: { pinyin: "zěnme", meaning: "như thế nào" },
+        怎么样: { pinyin: "zěnmeyàng", meaning: "như thế nào" },
+        这: { pinyin: "zhè", meaning: "này" },
+        中国: { pinyin: "Zhōngguó", meaning: "Trung Quốc" },
+        中午: { pinyin: "zhōngwǔ", meaning: "buổi trưa" },
+        住: { pinyin: "zhù", meaning: "sống, ở" },
+        桌子: { pinyin: "zhuōzi", meaning: "cái bàn" },
+        字: { pinyin: "zì", meaning: "chữ" },
+        昨天: { pinyin: "zuótiān", meaning: "hôm qua" },
+        坐: { pinyin: "zuò", meaning: "ngồi" },
+        做: { pinyin: "zuò", meaning: "làm" },
       };
-      document.body.appendChild(script);
+
+      function renderChar() {
+        const char = document.getElementById("inputChar").value.trim();
+        const info = dict[char];
+        if (!info) {
+          alert("Không tìm thấy từ trong HSK1!");
+          return;
+        }
+
+        document.getElementById("pinyin").textContent = info.pinyin;
+        document.getElementById("meaning").textContent = info.meaning;
+        document.getElementById("writer").innerHTML = "";
+
+        HanziWriter.create("writer", char, {
+          width: 500,
+          height: 500,
+          padding: 10,
+          showOutline: true,
+          showCharacter: false,
+        }).loopCharacterAnimation();
+      }
     </script>
   </body>
 </html>
