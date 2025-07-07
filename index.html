@@ -2,31 +2,39 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Hanzi Viewer</title>
+    <title>Hanzi Writer Viewer</title>
     <script src="https://unpkg.com/hanzi-writer@2.0.2/dist/hanzi-writer.min.js"></script>
     <style>
       body {
         text-align: center;
         font-family: sans-serif;
+        padding: 40px;
       }
       #target {
         width: 450px;
         height: 450px;
-        margin: auto;
+        margin: 20px auto;
+      }
+      .pinyin {
+        font-size: 22px;
+        margin-top: 10px;
+        color: #333;
       }
     </style>
   </head>
   <body>
     <h1>Hán tự: <span id="character"></span></h1>
     <div id="target"></div>
+    <div id="info"></div>
 
     <script>
+      // Lấy ký tự từ URL (vd: /我)
       const char = decodeURIComponent(
         window.location.pathname.slice(1) || "你"
       );
       document.getElementById("character").textContent = char;
 
-      // Render nét viết
+      // Hiển thị nét viết
       const writer = HanziWriter.create("target", char, {
         width: 500,
         height: 500,
@@ -37,14 +45,16 @@
       });
       writer.animateCharacter();
 
-      // Fetch pinyin tự động
+      // Gọi API lấy pinyin
       fetch(`https://pinyin-api.vercel.app/api/pinyin?text=${char}`)
         .then((res) => res.json())
         .then((data) => {
-          const pinyin = data.join(" ");
+          const pinyin = Array.isArray(data) ? data.join(" ") : data;
+          const infoBox = document.getElementById("info");
           const pEl = document.createElement("p");
+          pEl.className = "pinyin";
           pEl.innerText = "Pinyin: " + pinyin;
-          document.body.appendChild(pEl);
+          infoBox.appendChild(pEl);
         })
         .catch((err) => {
           console.error("Lỗi khi lấy pinyin:", err);
