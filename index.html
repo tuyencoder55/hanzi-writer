@@ -28,16 +28,14 @@
     <div id="info"></div>
 
     <script>
-      // Lấy ký tự từ URL (vd: /我)
       const char = decodeURIComponent(
         window.location.pathname.slice(1) || "你"
       );
       document.getElementById("character").textContent = char;
 
-      // Hiển thị nét viết
       const writer = HanziWriter.create("target", char, {
-        width: 500,
-        height: 500,
+        width: 450,
+        height: 450,
         showOutline: true,
         showCharacter: false,
         strokeAnimationSpeed: 1.2,
@@ -45,20 +43,24 @@
       });
       writer.animateCharacter();
 
-      // Gọi API lấy pinyin
-      fetch(`https://pinyin-api.vercel.app/api/pinyin?text=${char}`)
-        .then((res) => res.json())
-        .then((data) => {
-          const pinyin = Array.isArray(data) ? data.join(" ") : data;
-          const infoBox = document.getElementById("info");
+      // ✅ Sử dụng API khác từ HanziGyan (tin cậy, JSONP)
+      const script = document.createElement("script");
+      script.src = `https://cdn.jsdelivr.net/gh/pepebecker/hanzi-lookup@master/dict/pinyin-lookup.js`;
+      script.onload = () => {
+        const pinyin = window.pinyinDict[char];
+        if (pinyin) {
           const pEl = document.createElement("p");
           pEl.className = "pinyin";
           pEl.innerText = "Pinyin: " + pinyin;
-          infoBox.appendChild(pEl);
-        })
-        .catch((err) => {
-          console.error("Lỗi khi lấy pinyin:", err);
-        });
+          document.getElementById("info").appendChild(pEl);
+        } else {
+          const pEl = document.createElement("p");
+          pEl.className = "pinyin";
+          pEl.innerText = "Pinyin: không tìm thấy 😥";
+          document.getElementById("info").appendChild(pEl);
+        }
+      };
+      document.body.appendChild(script);
     </script>
   </body>
 </html>
