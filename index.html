@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hanzi Writer Viewer</title>
+    <script src="https://unpkg.com/hanzi-writer@2.0.2/dist/hanzi-writer.min.js"></script>
+    <style>
+      body {
+        text-align: center;
+        font-family: sans-serif;
+      }
+      #target {
+        width: 300px;
+        height: 300px;
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Hán tự: <span id="character"></span></h1>
+    <div id="target"></div>
+    <script>
+      const char = decodeURIComponent(
+        window.location.pathname.slice(1) || "你"
+      );
+      document.getElementById("character").textContent = char;
+      const writer = HanziWriter.create("target", char, {
+        width: 300,
+        height: 300,
+        strokeAnimationSpeed: 1.2,
+        delayBetweenStrokes: 150,
+        showOutline: true,
+        showCharacter: false,
+      });
+      writer.animateCharacter();
+    </script>
+  </body>
+</html>
