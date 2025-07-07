@@ -2,7 +2,7 @@
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
-    <title>HSK1 Viewer</title>
+    <title>Hanzi Viewer - HSK1</title>
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@2.1.2/dist/hanzi-writer.min.js"></script>
     <style>
       body {
@@ -11,8 +11,8 @@
         padding: 40px;
       }
       #hanzi {
-        font-size: 64px;
-        margin-bottom: 10px;
+        font-size: 80px;
+        margin-bottom: 20px;
       }
       #writer {
         width: 300px;
@@ -22,11 +22,11 @@
       #pinyin {
         font-size: 24px;
         font-weight: bold;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
       }
       #meaning {
         font-size: 20px;
-        color: #444;
+        color: #333;
       }
     </style>
   </head>
@@ -37,7 +37,6 @@
     <div id="meaning"></div>
 
     <script>
-      // === DỮ LIỆU 150 TỪ HSK1 ===
       const dict = {
         爱: { pinyin: "ài", meaning: "yêu" },
         八: { pinyin: "bā", meaning: "số 8" },
@@ -191,12 +190,8 @@
         做: { pinyin: "zuò", meaning: "làm" },
       };
 
-      function getCharacterFromURL() {
-        const path = decodeURIComponent(window.location.pathname.slice(1));
-        return path;
-      }
-
-      const char = getCharacterFromURL();
+      // Lấy chữ từ URL
+      const char = decodeURIComponent(location.pathname.slice(1));
       const data = dict[char];
 
       if (data) {
@@ -210,9 +205,11 @@
           padding: 10,
           showOutline: true,
           showCharacter: false,
+          delayBetweenLoops: 1000,
+          strokeAnimationSpeed: 1,
         }).loopCharacterAnimation();
       } else {
-        document.body.innerHTML = `<h2>❌ Không tìm thấy từ "${char}" trong danh sách.</h2>`;
+        document.body.innerHTML = `<h2>❌ Không tìm thấy từ "${char}" trong danh sách!</h2>`;
       }
     </script>
   </body>
