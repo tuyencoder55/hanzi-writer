@@ -2,11 +2,11 @@
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
-    <title>Hanzi Viewer - HSK1</title>
+    <title>HSK1 Hanzi Viewer</title>
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@2.1.2/dist/hanzi-writer.min.js"></script>
     <style>
       body {
-        font-family: Arial, sans-serif;
+        font-family: "Arial", sans-serif;
         text-align: center;
         padding: 40px;
       }
@@ -17,16 +17,17 @@
       #writer {
         width: 300px;
         height: 300px;
-        margin: 0 auto 20px;
+        margin: auto;
       }
       #pinyin {
         font-size: 24px;
         font-weight: bold;
-        margin-bottom: 8px;
+        margin-top: 20px;
       }
       #meaning {
         font-size: 20px;
         color: #333;
+        margin-top: 8px;
       }
     </style>
   </head>
@@ -190,7 +191,6 @@
         做: { pinyin: "zuò", meaning: "làm" },
       };
 
-      // Lấy chữ từ URL
       const char = decodeURIComponent(location.pathname.slice(1));
       const data = dict[char];
 
@@ -205,11 +205,11 @@
           padding: 10,
           showOutline: true,
           showCharacter: false,
-          delayBetweenLoops: 1000,
+          delayBetweenLoops: 800,
           strokeAnimationSpeed: 1,
         }).loopCharacterAnimation();
       } else {
-        document.body.innerHTML = `<h2>❌ Không tìm thấy từ "${char}" trong danh sách!</h2>`;
+        document.body.innerHTML = `<h2>❌ Không tìm thấy từ "<b>${char}</b>" trong danh sách!</h2>`;
       }
     </script>
   </body>
