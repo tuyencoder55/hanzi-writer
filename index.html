@@ -2,19 +2,18 @@
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hanzi HSK1 Viewer</title>
+    <title>HSK1 Viewer</title>
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@2.1.2/dist/hanzi-writer.min.js"></script>
     <style>
       body {
         font-family: Arial, sans-serif;
         text-align: center;
-        margin-top: 40px;
+        padding: 30px;
       }
       #writer {
-        margin: 20px auto;
         width: 300px;
         height: 300px;
+        margin: 20px auto;
       }
       #pinyin {
         font-size: 24px;
@@ -22,30 +21,18 @@
       }
       #meaning {
         font-size: 20px;
-        color: #555;
-      }
-      input {
-        font-size: 18px;
-        padding: 6px;
-        width: 200px;
-      }
-      button {
-        font-size: 16px;
-        padding: 6px 10px;
-        margin-left: 10px;
+        color: #444;
       }
     </style>
   </head>
   <body>
-    <h1>🧠 Học Hán Tự - HSK1</h1>
-    <input id="inputChar" placeholder="Nhập chữ Hán (VD: 我)" />
-    <button onclick="renderChar()">Hiển thị</button>
-
+    <h1 id="hanzi" style="font-size: 48px"></h1>
     <div id="writer"></div>
     <div id="pinyin"></div>
     <div id="meaning"></div>
 
     <script>
+      // Dán object dict vào đây (copy toàn bộ bạn đã có ở file canvas Hsk1 Dict Full)
       const dict = {
         爱: { pinyin: "ài", meaning: "yêu" },
         八: { pinyin: "bā", meaning: "số 8" },
@@ -199,25 +186,28 @@
         做: { pinyin: "zuò", meaning: "làm" },
       };
 
-      function renderChar() {
-        const char = document.getElementById("inputChar").value.trim();
-        const info = dict[char];
-        if (!info) {
-          alert("Không tìm thấy từ trong HSK1!");
-          return;
-        }
+      function getCharacterFromURL() {
+        const path = window.location.pathname;
+        return decodeURIComponent(path.slice(1));
+      }
 
-        document.getElementById("pinyin").textContent = info.pinyin;
-        document.getElementById("meaning").textContent = info.meaning;
-        document.getElementById("writer").innerHTML = "";
+      const char = getCharacterFromURL();
+      const data = dict[char];
+
+      if (data) {
+        document.getElementById("hanzi").textContent = char;
+        document.getElementById("pinyin").textContent = data.pinyin;
+        document.getElementById("meaning").textContent = data.meaning;
 
         HanziWriter.create("writer", char, {
-          width: 500,
-          height: 500,
+          width: 300,
+          height: 300,
           padding: 10,
           showOutline: true,
           showCharacter: false,
         }).loopCharacterAnimation();
+      } else {
+        document.body.innerHTML = `<h2>❌ Không tìm thấy từ "${char}" trong HSK1!</h2>`;
       }
     </script>
   </body>
